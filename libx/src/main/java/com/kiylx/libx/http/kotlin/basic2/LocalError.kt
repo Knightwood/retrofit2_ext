@@ -1,4 +1,4 @@
-package com.kiylx.libx.http.kotlin.common
+package com.kiylx.libx.http.kotlin.basic2
 
 /**
  * 表示一些错误状态

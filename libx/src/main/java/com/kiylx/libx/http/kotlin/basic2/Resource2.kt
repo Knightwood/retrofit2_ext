@@ -1,6 +1,5 @@
 package com.kiylx.libx.http.kotlin.basic2
 
-import com.kiylx.libx.http.kotlin.common.LocalError
 import com.kiylx.libx.http.kotlin.common.RawResponse
 
 sealed class Resource2<out T> {

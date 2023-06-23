@@ -96,7 +96,7 @@ open class Retrofit2Holder(val baseUrl: String) {
  */
 object OkhttpClientProvider {
     //每次获取okHttpClient是否都调用一次build()
-    var reCreate=false
+    var reCreate = false
     lateinit var builder: OkHttpClient.Builder
     var okHttpClient: OkHttpClient? = null
         get() {
@@ -108,11 +108,14 @@ object OkhttpClientProvider {
 
     fun configOkHttpClient(block: OkHttpClient.Builder.() -> Unit) {
         if (this::builder.isInitialized) {
-            return
+            if (reCreate) {
+                builder.block()
+            } else {
+                return
+            }
         } else {
             builder = OkHttpClient.Builder()
             builder.block()
-
         }
 
     }

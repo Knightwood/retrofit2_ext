@@ -1,8 +1,7 @@
 package com.kiylx.libx.http.kotlin.basic
 
-import com.kiylx.libx.http.kotlin.common.LocalError
+import com.kiylx.libx.http.kotlin.basic2.LocalError
 import com.kiylx.libx.http.kotlin.common.RawResponse
-import com.kiylx.libx.http.kotlin.basic.Status
 
 /**
  * 创建者 kiylx

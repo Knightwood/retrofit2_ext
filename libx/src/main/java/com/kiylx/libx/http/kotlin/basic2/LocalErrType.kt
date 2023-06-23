@@ -1,7 +1,5 @@
 package com.kiylx.libx.http.kotlin.basic2
 
-import com.kiylx.libx.http.kotlin.common.LocalError
-
 /**
  * 生成本地错误
  */
