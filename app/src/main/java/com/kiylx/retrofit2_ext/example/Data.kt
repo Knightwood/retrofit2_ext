@@ -10,7 +10,7 @@ abstract class Data {
 data class FriendData(
     override val errorCode: Int = 0,
     override val errorMsg: String = "",
-    override val data: FriendInfo?=null
+    override val data: List<FriendInfo>?= emptyList()
 ) : Data() {
 
     @kotlinx.serialization.Serializable
