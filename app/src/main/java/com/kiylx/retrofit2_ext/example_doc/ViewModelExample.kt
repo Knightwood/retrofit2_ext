@@ -1,12 +1,12 @@
-package com.kiylx.retrofit2_ext.example
+package com.kiylx.retrofit2_ext.example_doc
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiylx.libx.http.kotlin.basic.Resource
 import com.kiylx.libx.http.kotlin.basic2.Resource2
-import com.kiylx.retrofit2_ext.example.bean.User
-import com.kiylx.retrofit2_ext.example.bean.User2
+import com.kiylx.retrofit2_ext.example_doc.bean.User
+import com.kiylx.retrofit2_ext.example_doc.bean.User2
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 

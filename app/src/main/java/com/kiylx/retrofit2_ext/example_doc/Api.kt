@@ -1,8 +1,8 @@
-package com.kiylx.retrofit2_ext.example
+package com.kiylx.retrofit2_ext.example_doc
 
 
-import com.kiylx.retrofit2_ext.example.bean.User
-import com.kiylx.retrofit2_ext.example.bean.User2
+import com.kiylx.retrofit2_ext.example_doc.bean.User
+import com.kiylx.retrofit2_ext.example_doc.bean.User2
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody

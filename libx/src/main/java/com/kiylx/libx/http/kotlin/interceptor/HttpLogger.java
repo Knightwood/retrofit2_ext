@@ -1,7 +1,7 @@
 package com.kiylx.libx.http.kotlin.interceptor;
 
-import com.blankj.utilcode.util.LogUtils;
 
+import android.util.Log;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 //打印okhttp请求
@@ -29,7 +29,7 @@ public class HttpLogger implements HttpLoggingInterceptor.Logger {
         mMessage.append(message.concat("\n"));
         // 请求或者响应结束，打印整条日志
         if (message.startsWith("<-- END HTTP")) {
-            LogUtils.dTag(TAG, mMessage.toString());
+            Log.d(TAG, mMessage.toString());
         }
     }
 }

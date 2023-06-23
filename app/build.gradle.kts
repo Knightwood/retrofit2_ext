@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     kotlin("android")
+    kotlin("plugin.serialization") version "1.7.10"
 }
 
 android {
@@ -39,6 +40,8 @@ android {
 dependencies {
     implementation(AndroidX.Core.core)
     implementation(AndroidX.appCompat)
+    implementation(AndroidX.material)
+    implementation(AndroidX.constraintLayout)
 
      implementation(project(path = Modules.libx))
     testImplementation("junit:junit:4.13.2")

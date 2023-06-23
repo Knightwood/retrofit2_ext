@@ -1,5 +1,6 @@
 package com.kiylx.libx.http.kotlin.common
 
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -65,8 +66,12 @@ internal suspend fun <T : Any> handleRequest(
         } catch (e: IOException) {
             //如果有IO异常,那说明是网络有问题,直接将错误信息的值发送出去
 
-            e.printStackTrace()
+            Log.e("tty2-handleRequest", "handleRequest:error ", e)
             val err = ErrorResponse(ErrorType.NETWORK_ERROR, null, null)
+            result = RawResponse.Error(err, e)
+        } catch (e:kotlinx.serialization.SerializationException){
+            Log.e("tty2-handleRequest", "handleRequest:类型转换错误 ", e)
+            val err = ErrorResponse(ErrorType.RESPONSE_ERROR, null, null)
             result = RawResponse.Error(err, e)
         }
     }

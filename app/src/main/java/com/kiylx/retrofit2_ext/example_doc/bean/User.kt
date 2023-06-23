@@ -1,4 +1,4 @@
-package com.kiylx.retrofit2_ext.example.bean
+package com.kiylx.retrofit2_ext.example_doc.bean
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable

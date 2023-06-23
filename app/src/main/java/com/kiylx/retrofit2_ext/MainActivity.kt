@@ -2,52 +2,77 @@ package com.kiylx.retrofit2_ext
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
-import com.kiylx.immersionbar.R
-import com.kiylx.libx.http.kotlin.common.OkhttpClientProvider
-import com.kiylx.libx.http.okhttp_logger.Level
-import com.kiylx.libx.http.okhttp_logger.LoggingInterceptor
-import com.kiylx.retrofit2_ext.example.HeaderInterceptor
-import okhttp3.Dispatcher
-import okhttp3.OkHttpClient
-import java.util.concurrent.TimeUnit
+import androidx.activity.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewModelScope
+import com.kiylx.libx.http.kotlin.basic2.Resource2
+import com.kiylx.retrofit2_ext.example.FriendData
+import com.kiylx.retrofit2_ext.example.WanAndroidRepo
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
+    lateinit var handler: Handler
+    val vm: VM by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-    }
-
-    /**
-     * 配置全局的okhttpclient
-     */
-    fun configOkHttp() {
-        OkhttpClientProvider.configOkHttpClient {
-            val dispatcher = Dispatcher()
-            dispatcher.maxRequests = 1
-            var loggerInterceptor: LoggingInterceptor? = null
-            val isDebug = true
-            if (isDebug) {
-                loggerInterceptor = LoggingInterceptor.Builder()
-                    .setLevel(Level.BASIC)
-                    .log(Log.VERBOSE)
-                    .singleTag(true)
-                    .tag("tty1-HttpLogger")
-                    .build()
-            }
-
-            this
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .writeTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(10, TimeUnit.SECONDS)
-                .addInterceptor(HeaderInterceptor())
-            if (isDebug) {//debug模式添加日志打印
-                loggerInterceptor?.let {
-                    this.addInterceptor(it)
+        handler = Handler(Looper.getMainLooper())
+        this.lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                vm.friendDataFlow.collect {
+                    when (it) {
+                        Resource2.EmptyLoading -> {
+                            Log.d(TAG, "onCreate: empty loading")
+                        }
+                        is Resource2.Loading<*> -> {
+                            Log.d(TAG, "onCreate: loading")
+                        }
+                        is Resource2.LocalFailed -> {
+                            Log.d(TAG, "onCreate: LocalFailed")
+                        }
+                        is Resource2.RequestError -> {
+                            Log.d(TAG, "onCreate: RequestError")
+                        }
+                        is Resource2.Success -> {
+                            Log.d(TAG, "onCreate: Success")
+                        }
+                    }
                 }
             }
-            this.dispatcher(dispatcher)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        handler.postDelayed({
+            vm.requestFriendData()
+        }, 1500L)
+    }
+
+    companion object {
+        const val TAG = "tty2-MainActivity"
+    }
+
+}
+
+class VM : ViewModel() {
+    private var _friendDataFlow: MutableStateFlow<Resource2<FriendData>> =
+        MutableStateFlow(Resource2.EmptyLoading)
+    val friendDataFlow: StateFlow<Resource2<FriendData>>
+        get() = _friendDataFlow
+
+    fun requestFriendData() {
+        viewModelScope.launch {
+            _friendDataFlow.emit(WanAndroidRepo.getData())
         }
     }
 }

@@ -1,8 +1,6 @@
 package com.kiylx.libx.http.kotlin.common
 
-import com.kiylx.libx.kotlin.exceptionTag
-import com.kiylx.libx.kotlin.logWith
-import com.kiylx.libx.kotlin.withIo
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
@@ -17,6 +15,7 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object NetworkUtils {
+    const val TAG = "tty2-NetworkUtils"
     private var ip: String = ""//外网ip
 
     /**
@@ -42,7 +41,8 @@ object NetworkUtils {
                     if (responseCode == HttpURLConnection.HTTP_OK) {
                         inStream = httpConnection.inputStream
                         val reader = BufferedReader(
-                            InputStreamReader(inStream, "utf-8"))
+                            InputStreamReader(inStream, "utf-8")
+                        )
                         val sb = StringBuilder()
                         var line: String?
                         while (reader.readLine().also { line = it } != null) {
@@ -58,17 +58,17 @@ object NetworkUtils {
                         }
                     }
                 } catch (e: MalformedURLException) {
-                    e logWith exceptionTag
+                    Log.e(TAG, "getNetExtraNetIpAddress", e)
                 } catch (e: IOException) {
-                    e logWith exceptionTag
+                    Log.e(TAG, "getNetExtraNetIpAddress", e)
                 } finally {
                     try {
                         inStream?.close()
                         httpConnection?.disconnect()
                     } catch (e: IOException) {
-                        e logWith exceptionTag
+                        Log.e(TAG, "getNetExtraNetIpAddress", e)
                     } catch (ex: Exception) {
-                        ex logWith exceptionTag
+                        Log.e(TAG, "getNetExtraNetIpAddress", ex)
                     }
                 }
                 ip = ipLine

@@ -57,6 +57,7 @@ suspend inline fun <reified T : Any, reified E : BaseErrorHandler> handleApi(
         is RawResponse.Error -> {
             errorHandler?.let {
                 when (rawResponse.errorMsg.errorType) {
+                    RESPONSE_ERROR,
                     NETWORK_ERROR -> it.ExceptionErr(rawResponse)
                     SERVICE_ERROR -> it.FailedErr(rawResponse)
                 }

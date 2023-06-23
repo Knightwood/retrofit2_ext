@@ -1,3 +1,7 @@
+@file:Suppress(
+    "unused",
+    "SpellCheckingInspection",
+)
 object AndroidX {
     //api了 core：1.8.0； fragment:1.3.6; activity:1.5.0
     const val appCompat = "androidx.appcompat:appcompat:1.5.0"

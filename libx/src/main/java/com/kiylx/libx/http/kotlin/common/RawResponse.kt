@@ -34,7 +34,7 @@ data class ErrorResponse(
 enum class ErrorType {
     NETWORK_ERROR,
     SERVICE_ERROR,
-    //RESPONSE_ERROR//请求返回值异常
+    RESPONSE_ERROR//请求返回值异常
 }
 
 /**
@@ -62,6 +62,9 @@ inline infix fun RawResponse.Error.parseError(block: (s: String) -> Unit) {
         }
         ErrorType.SERVICE_ERROR -> {
             block(errorMsg.message.toString())
+        }
+        ErrorType.RESPONSE_ERROR->{
+            block("反序列化失败")
         }
     }
 }

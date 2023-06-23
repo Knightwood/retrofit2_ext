@@ -1,13 +1,13 @@
-package com.kiylx.retrofit2_ext.example
+package com.kiylx.retrofit2_ext.example_doc
 
 import com.kiylx.libx.http.kotlin.basic.Resource
 import com.kiylx.libx.http.kotlin.basic.handleApi
 import com.kiylx.libx.http.kotlin.basic2.Resource2
 import com.kiylx.libx.http.kotlin.basic2.handle2
 import com.kiylx.libx.http.kotlin.common.*
-import com.kiylx.retrofit2_ext.example.bean.BaseData
-import com.kiylx.retrofit2_ext.example.bean.User
-import com.kiylx.retrofit2_ext.example.bean.User2
+import com.kiylx.retrofit2_ext.example_doc.bean.BaseData
+import com.kiylx.retrofit2_ext.example_doc.bean.User
+import com.kiylx.retrofit2_ext.example_doc.bean.User2
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -15,13 +15,13 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.ResponseBody
 import java.io.File
 
 
 class RepoExample {
+    val baseUrl="https://www.wanandroid.com"
     //单例方式，全局唯一，要生成其他baseurl下的retrofit，要使用Retrofit2Holder
-    val mainApi = SingleServiceCreator.newInstance("baseUrl").create(Api::class.java)
+    val mainApi = SingleServiceCreator.newInstance(baseUrl).create(Api::class.java)
     //这个方式非单例
     //val example=Retrofit2Holder("baseUrl").create(Api::class.java)
 
