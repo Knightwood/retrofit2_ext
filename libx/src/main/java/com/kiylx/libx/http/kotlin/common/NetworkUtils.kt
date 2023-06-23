@@ -15,7 +15,7 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object NetworkUtils {
-    const val TAG = "tty2-NetworkUtils"
+    private const val TAG = "tty2-NetworkUtils"
     private var ip: String = ""//外网ip
 
     /**

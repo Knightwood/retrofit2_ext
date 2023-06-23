@@ -3,7 +3,7 @@ package com.kiylx.retrofit2_ext.example_doc
 import com.kiylx.libx.http.kotlin.basic.Resource
 import com.kiylx.libx.http.kotlin.basic.handleApi
 import com.kiylx.libx.http.kotlin.basic2.Resource2
-import com.kiylx.libx.http.kotlin.basic2.handle2
+import com.kiylx.libx.http.kotlin.basic2.handleApi2
 import com.kiylx.libx.http.kotlin.common.*
 import com.kiylx.retrofit2_ext.example_doc.bean.BaseData
 import com.kiylx.retrofit2_ext.example_doc.bean.User
@@ -62,7 +62,7 @@ class RepoExample {
         val descriptionString = "hello, this is description speaking"
 
         val description: RequestBody = descriptionString.toRequestBody()
-        return@withContext handle2(mainApi.post3(description, body))
+        return@withContext handleApi2(mainApi.post3(description, body))
     }
 
 

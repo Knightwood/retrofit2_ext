@@ -2,16 +2,10 @@ package com.kiylx.libx.http.kotlin.basic
 
 import com.kiylx.libx.http.kotlin.common.ErrorType.*
 import com.kiylx.libx.http.kotlin.common.BaseErrorHandler
-import com.kiylx.libx.http.kotlin.common.ErrorResponse
 import com.kiylx.libx.http.kotlin.common.RawResponse
-import com.kiylx.libx.http.kotlin.common.handleRequest
+import com.kiylx.libx.http.kotlin.common.RequestHandler
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import retrofit2.Call
-import retrofit2.Response
-import java.io.IOException
-
 
 
 /*
@@ -35,38 +29,27 @@ import java.io.IOException
  * 很多情况下不用在某些code情况下额外处理
  * 所以可以调用此方法,减少代码量
  */
-suspend inline fun <reified T : Any> handle(action: Call<T>): Resource<T> {
+suspend inline fun <reified T : Any> handleApi(action: Call<T>): Resource<T> {
     return handleApi(action, null)
 }
 
-suspend inline infix fun <reified T : Any> CoroutineScope.handleWith(action: Call<T>): Resource<T> {
+suspend inline infix fun <reified T : Any> CoroutineScope.handleApiWith(action: Call<T>): Resource<T> {
     return handleApi(action, null)
 }
+
 /**
  * @param action retrofit执行得到的Call<T>
  *@param block 令调用者可以判断服务器的具体返回结果，做出额外处理，
  */
 suspend inline fun <reified T : Any, reified E : BaseErrorHandler> handleApi(
     action: Call<T>,
-    errorHandler: E?,
+    errorHandler: E? = null,
 ): Resource<T> {
-    val rawResponse = handleRequest {
-        action.execute()
-    }
-    return when (rawResponse) {
+    return when (val rawResponse: RawResponse<T> = RequestHandler.handle(action, errorHandler)) {
         is RawResponse.Error -> {
-            errorHandler?.let {
-                when (rawResponse.errorMsg.errorType) {
-                    RESPONSE_ERROR,
-                    NETWORK_ERROR -> it.ExceptionErr(rawResponse)
-                    SERVICE_ERROR -> it.FailedErr(rawResponse)
-                }
-            }//网络请求失败
             Resource.error(rawResponse)
         }
         is RawResponse.Success -> {
-            //网络请求成功(HttpCode==200),服务器返回了数据
-            errorHandler?.OnSuccess(rawResponse)
             val info = rawResponse.responseData
             Resource.success(info)
         }

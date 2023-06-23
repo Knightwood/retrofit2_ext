@@ -27,14 +27,14 @@ sealed class RawResponse<out T> {
 data class ErrorResponse(
     val errorType: ErrorType,//错误类型
     //val errorTag:String,//错误tag,用于区别哪个请求出错
-    val errorCode: Int?,//错误代码 SERVICE_ERROR
-    val message: String?,//错误信息 SERVICE_ERROR
+    val errorCode: Int?,//错误代码
+    val message: String?,//错误信息
 )
 
 enum class ErrorType {
-    NETWORK_ERROR,
-    SERVICE_ERROR,
-    RESPONSE_ERROR//请求返回值异常
+    NETWORK_ERROR,//网络原因失败
+    SERVICE_ERROR,//请求失败
+    DATE_FORMAT_ERROR//请求返回数据反序列化失败
 }
 
 /**
@@ -63,7 +63,7 @@ inline infix fun RawResponse.Error.parseError(block: (s: String) -> Unit) {
         ErrorType.SERVICE_ERROR -> {
             block(errorMsg.message.toString())
         }
-        ErrorType.RESPONSE_ERROR->{
+        ErrorType.DATE_FORMAT_ERROR->{
             block("反序列化失败")
         }
     }
