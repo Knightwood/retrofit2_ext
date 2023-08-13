@@ -89,6 +89,7 @@ class MediaTypeStr {
         const val form_data: String = "multipart/form-data"
         const val image: String = "image/*"
         const val text: String = "text/*"
+        const val application_json :String ="application/json"
     }
 }
 

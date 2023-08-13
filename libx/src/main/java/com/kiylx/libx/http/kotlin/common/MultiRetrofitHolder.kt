@@ -37,32 +37,9 @@ object MultiRetrofitHolder {
 }
 
 /**
- * 只有单个retrofit
- */
-class SingleServiceCreator private constructor(baseUrl: String) {
-    private val retrofitHolder: Retrofit2Holder = Retrofit2Holder(baseUrl)
-
-    /**
-     * 传入apiService接口，得到实例
-     */
-    fun <T> create(clazz: Class<T>): T = retrofitHolder.create(clazz)
-
-    companion object {
-        @Volatile
-        private var singleCreator: SingleServiceCreator? = null
-        fun newInstance(baseUrl: String): SingleServiceCreator =
-            singleCreator ?: synchronized(this) {
-                singleCreator ?: SingleServiceCreator(baseUrl)
-            }
-    }
-
-}
-
-/**
  * 持有okhttpclient和retrofit
- * 继承并重写方法，以实现自定义
+ * 调用[config]方法，以实现自定义
  * @param baseUrl baseurl
- * @param json 自定义Json的配置
  * ```
  * prettyPrint = true //json格式化
  * isLenient = true //宽松解析，json格式异常也可解析，如：{name:"小红",age:"18"} + Person(val name:String,val age:Int) ->Person("小红",18)
@@ -74,33 +51,37 @@ class SingleServiceCreator private constructor(baseUrl: String) {
  * allowSpecialFloatingPointValues =  true //特殊浮点值：允许Double为NaN或无穷大
 ```
  */
-open class Retrofit2Holder(private val baseUrl: String, private val json: Json = Json) {
-    val mOkHttpClient: OkHttpClient by lazy { createOkHttpClient() }
-    val mRetrofit: Retrofit by lazy { createRetrofit(mOkHttpClient) }
-    private val contentType = "application/json".toMediaType()
+@OptIn(ExperimentalSerializationApi::class)
+class Retrofit2Holder(
+    var baseUrl: String,
+) {
+    var json: Json = Json {
+        ignoreUnknownKeys = true
+        coerceInputValues = true
+    }
+    var contentType = "application/json".toMediaType()
+    var mOkHttpClient: OkHttpClient? = OkhttpClientProvider.okHttpClient
+    var mRetrofit: Retrofit
 
-    @OptIn(ExperimentalSerializationApi::class)
-    open fun createRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    init {
         val builder = Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(json.asConverterFactory(contentType))
-            .client(okHttpClient)
-        return builder.build()
+            .client(mOkHttpClient!!)
+        mRetrofit = builder.build()
     }
 
     /**
-     * 重写此方法以提供自定义实现，或者，修改[OkhttpClientProvider]中的实现。
-     * 这两种方式，可以根据需要，使得 OkhttpClient是单例，或者不是。
+     * 调用此方法实现自定义内部配置
      */
-    open fun createOkHttpClient(): OkHttpClient {
-        return OkhttpClientProvider.okHttpClient!!
+    fun config(block: Retrofit2Holder.() -> Unit) {
+        this.block()
     }
 
     /**
      * 传入apiService接口，得到实例
      */
     fun <T> create(clazz: Class<T>): T = mRetrofit.create(clazz)
-
 }
 
 /**
