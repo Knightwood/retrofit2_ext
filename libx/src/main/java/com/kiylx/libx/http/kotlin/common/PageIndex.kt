@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.StateFlow
  *
  */
 class Paging<T>(
-    var pageSize: Int = 10,
+    var pageSize: Int = 20,
 ) {
     //记录当前的index，初始化时，还没有任何数据，为0
     var currentIndex: Int = 0
@@ -55,9 +55,7 @@ class Paging<T>(
     var sizeRecord = 0 to 0
         private set
 
-    //总的数据总量
-    var totalSize: Int = 0
-        private set
+
 
     //记录上一次的index，初始化时为0
     var oldIndex: Int = currentIndex
@@ -66,8 +64,13 @@ class Paging<T>(
     //加载状态
     var loadStatus: MutableStateFlow<LoadState> = MutableStateFlow(LoadState.INIT)
 
+    //总的数据总量
+    var totalSize: Int = 0
+        private set
+    var hasNextPage:Boolean =false
+
     fun hasNext(): Boolean {
-        return datasList.value.size < totalSize
+        return (datasList.value.size < totalSize)||hasNextPage
     }
 
     /**
@@ -98,6 +101,7 @@ class Paging<T>(
         loadStatus.emit(LoadState.LOADING)
         val pair = block(currentIndex, pageSize)
         val datas = pair.data
+        if (pair.state is LoadState.NO_LOADING){
         if (datas.isNotEmpty()) {
             sizeRecord =
                 oldTotalDatasList.size to (oldTotalDatasList.size + datas.size)//记录加载前和之后的数据总量
@@ -109,7 +113,9 @@ class Paging<T>(
 
             oldIndex = currentIndex//记录数据加载前的index
             this.currentIndex += 1//记录当前的index
-
+            }
+            //更新分页判断
+            this.hasNextPage=pair.state.hasMoreData
             this.totalSize = if (pair.total != this.totalSize && pair.total > 0) {
                 pair.total
             } else {
@@ -124,8 +130,8 @@ class Paging<T>(
     }
 
     data class PagerData<T>(
-        val data: List<T>,
         val state: LoadState = LoadState.NO_LOADING(true),
+        val data: List<T> = emptyList(),
         val total: Int = -1,
     ) {
         companion object {
@@ -140,6 +146,12 @@ class Paging<T>(
         object LOADING : LoadState()
         object FAILED : LoadState()
         object INIT : LoadState()// 初始化
-        data class NO_LOADING(val hasMoreData: Boolean) : LoadState()
+        data class NO_LOADING(val hasMoreData: Boolean) : LoadState(){
+//            override fun equals(other: Any?): Boolean = false
+//
+//            override fun hashCode(): Int {
+//                return Random.nextInt()
+//            }
+        }
     }
 }

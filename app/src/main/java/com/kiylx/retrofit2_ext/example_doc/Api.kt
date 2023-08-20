@@ -142,7 +142,7 @@ interface Api {
     @POST("/upload")
     fun upload(
         @Part("file") file: RequestBody,
-        @PartMap params: Map<String, RequestBody>,
+        @PartMap params: Map<String, @JvmSuppressWildcards  RequestBody>,
     ): Call<ResponseBody>
 
 
@@ -159,5 +159,36 @@ interface Api {
         //文件也可以用这个包装，然后再用MultipartBody.Part包装
         @Part part2: RequestBody,
     ): Call<ResponseBody>
+
+    /**
+     * 对于json字符串，也可以放进multipartbody
+     * 比如后端的接口中，用@RequestPart注解注释entity
+     * ```
+     * @PostMapping("/bb")
+     * 	Response bb(@RequestPart Entity entity, @RequestPart(required = false) MultipartFile file);
+     *```
+     * 对于调用，示例：
+     * ```
+     * suspend fun test() {
+     *         val entity = Entity(1, "33")
+     *         val jsonStr = Json.encodeToString(entity)
+     *
+     *         val entityPart = MultipartBody.Part.createFormData(
+     *             "entity",
+     *             null,
+     *             jsonStr.toRequestBody(MediaTypeStr.json.toMediaTypeOrNull())
+     *         )
+     *         handle(
+     *             mainApi.test(entityPart, null)
+     *         )
+     *     }
+     *```
+     */
+    @POST("aa/bb")
+    @Multipart
+    fun test(
+        @Part entity:MultipartBody.Part,
+        @Part file: MultipartBody.Part?
+    ):Call<ResponseBody>
 
 }
