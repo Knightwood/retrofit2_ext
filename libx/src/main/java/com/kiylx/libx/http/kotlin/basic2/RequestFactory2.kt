@@ -21,7 +21,7 @@ suspend inline fun <reified T : Any, reified E : BaseErrorHandler> handleApi2(
 ): Resource2<T> {
     return when (val rawResponse: RawResponse<T> = RequestHandler.handle(action,errorHandler)) {
         is RawResponse.Error -> {
-            Resource2.RequestError(rawResponse)
+            Resource2.Error(rawResponse)
         }
         is RawResponse.Success -> {
             val info = rawResponse.responseData

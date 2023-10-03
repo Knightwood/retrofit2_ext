@@ -1,4 +1,4 @@
-package com.kiylx.retrofit2_ext.example
+package com.kiylx.retrofit2_ext.example_2
 
 abstract class Data {
     abstract val errorCode: Int

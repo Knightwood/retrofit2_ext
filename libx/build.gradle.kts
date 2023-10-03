@@ -1,15 +1,15 @@
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
-    kotlin("plugin.serialization") version "1.7.10"
+    kotlin("plugin.serialization") version "1.9.0"
 }
 
 android {
     namespace = "com.kiylx.libx"
-    compileSdk = 32
+    compileSdk = 34
 
     defaultConfig {
-        minSdk = 21
+        minSdk = 26
         targetSdk = 32
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -47,7 +47,7 @@ dependencies {
     api(Retrofit2.logging)//日志打印
     api(Retrofit2.converterGson)
     api(Retrofit2.converterScalars)
-    api(Kotlin.serialization140)
+    api(Kotlin.serialization160rc)
     api(Retrofit2.converterKotlin)
     //Coroutines
     api(Coroutines.android)

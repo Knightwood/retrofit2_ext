@@ -2,20 +2,22 @@
     "unused",
     "SpellCheckingInspection",
 )
+
 object AndroidX {
     //api了 core：1.8.0； fragment:1.3.6; activity:1.5.0
     const val appCompat = "androidx.appcompat:appcompat:1.5.0"
     const val desugar = "com.android.tools:desugar_jdk_libs:1.2.2"
+
     //preference-ktx api了 fragment-ktx:1.3.6; preference:1.2.0; core-ktx:1.1.0; kotlin-stdlib:1.6.0 等
     //跟appcompat有点冲突，exclude(group = "androidx.lifecycle", module = "lifecycle-viewmodel-ktx")
     const val preference = "androidx.preference:preference-ktx:1.2.0"
     const val recyclerView = "androidx.recyclerview:recyclerview:1.2.1"
 
-    //material库api了 appcompat:1.5.0; cardview:1.0.0; constraintlayout:2.0.1; coordinatorlayout:1.1.0;
+    //material 1.7 库api了 appcompat:1.5.0; cardview:1.0.0; constraintlayout:2.0.1; coordinatorlayout:1.1.0;
     //androidx.core.core:1.6.0; drawerlayout:1.1.1; fragment:1.2.5; lifecycle-runtime:2.0.0; recyclerview:1.0.0
     //viewpager2:1.0.0; transition:1.2.0 等库
-    const val material = "com.google.android.material:material:1.7.0"
-    const val constraintLayout = "androidx.constraintlayout:constraintlayout:2.0.4"
+    const val material = "com.google.android.material:material:1.8.0"
+    const val constraintLayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 
     object Core {
         //api了 core：1.8.0
@@ -84,14 +86,17 @@ object Jackson {
 }
 
 object Kotlin {
-    object Version {
-        const val kotlin = "1.7.10"
-    }
     //kotlin序列化 kt 1.7.10
     const val serialization140 = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
     const val datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0"
-    //kotlin序列化 kt1.6.21
+
+    //kotlin序列化 kt 1.6.21
     const val serialization133 = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3"
+
+    //kotlin序列化 kt 1.8.10
+    const val serialization150 = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0"
+    //kotlin序列化 kt 1.9.0
+    const val serialization160rc = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0-RC"
 }
 
 object Ktor {
@@ -147,11 +152,12 @@ object Retrofit2 {
     const val logging = "com.squareup.okhttp3:logging-interceptor:4.2.0"
 
     //打印okhttp的log库
-    const val logging2 = "com.github.ihsanbal:LoggingInterceptor:3.1.0"    //使用logging2需要添加 exclude(group = "org.json", module = "json")
+    const val logging2 =
+        "com.github.ihsanbal:LoggingInterceptor:3.1.0"    //使用logging2需要添加 exclude(group = "org.json", module = "json")
 
     //kotlin的转换器
     const val converterKotlin =
-        "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0"
+        "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0"
 
 }
 
@@ -195,7 +201,7 @@ object Common {
     //implementation("com.github.jakob-grabner:Circle-Progress-View:1.4")
 
     //app update
-    const val appUpdate="com.github.azhon:AppUpdate:4.0.0"
+    const val appUpdate = "com.github.azhon:AppUpdate:4.0.0"
 }
 
 object Tools {

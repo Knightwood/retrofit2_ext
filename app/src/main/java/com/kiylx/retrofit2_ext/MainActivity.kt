@@ -12,8 +12,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewModelScope
 import com.kiylx.libx.http.kotlin.basic2.Resource2
-import com.kiylx.retrofit2_ext.example.FriendData
-import com.kiylx.retrofit2_ext.example.WanAndroidRepo
+import com.kiylx.retrofit2_ext.example_2.FriendData
+import com.kiylx.retrofit2_ext.example_2.WanAndroidRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -33,18 +33,18 @@ class MainActivity : AppCompatActivity() {
                         Resource2.EmptyLoading -> {
                             Log.d(TAG, "onCreate: empty loading")
                         }
-                        is Resource2.Loading<*> -> {
+                        is Resource2.Loading -> {
                             Log.d(TAG, "onCreate: loading")
                         }
-                        is Resource2.LocalFailed -> {
-                            Log.d(TAG, "onCreate: LocalFailed")
-                        }
-                        is Resource2.RequestError -> {
+
+                        is Resource2.Error -> {
                             Log.d(TAG, "onCreate: RequestError")
                         }
                         is Resource2.Success -> {
                             Log.d(TAG, "onCreate: Success")
                         }
+
+                        is Resource2.OtherError -> TODO()
                     }
                 }
             }

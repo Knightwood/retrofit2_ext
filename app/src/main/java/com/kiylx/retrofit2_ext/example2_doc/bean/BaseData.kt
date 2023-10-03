@@ -1,6 +1,5 @@
-package com.kiylx.retrofit2_ext.example_doc.bean
+package com.kiylx.retrofit2_ext.example2_doc.bean
 
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 

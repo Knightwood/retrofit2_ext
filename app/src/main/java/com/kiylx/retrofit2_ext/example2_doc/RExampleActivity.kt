@@ -1,4 +1,4 @@
-package com.kiylx.retrofit2_ext.example_doc
+package com.kiylx.retrofit2_ext.example2_doc
 
 import android.os.Bundle
 import android.util.Log
@@ -45,11 +45,11 @@ class RExampleActivity : AppCompatActivity() {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 vm.uploadFlow.collectLatest { resource ->
                     when (resource) {
-                        is Resource2.Loading<*> -> TODO()
-                        is Resource2.LocalFailed -> TODO()
-                        is Resource2.RequestError -> TODO()
+                        is Resource2.Loading -> TODO()
+                        is Resource2.Error -> TODO()
                         is Resource2.Success -> TODO()
                         Resource2.EmptyLoading -> TODO()
+                        else -> {}
                     }
                 }
 

@@ -1,4 +1,4 @@
-package com.kiylx.retrofit2_ext.example_doc;
+package com.kiylx.retrofit2_ext.example2_doc;
 
 import org.jetbrains.annotations.NotNull;
 

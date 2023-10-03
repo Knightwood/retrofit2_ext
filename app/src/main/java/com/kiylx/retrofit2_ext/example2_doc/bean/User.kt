@@ -1,8 +1,7 @@
-package com.kiylx.retrofit2_ext.example_doc.bean
+package com.kiylx.retrofit2_ext.example2_doc.bean
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
