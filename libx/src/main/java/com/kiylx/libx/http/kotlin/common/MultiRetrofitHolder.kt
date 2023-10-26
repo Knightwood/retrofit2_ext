@@ -90,7 +90,7 @@ open class Retrofit2Holder(
 object OkhttpClientProvider {
     //每次获取okHttpClient是否都调用一次build()
     var reCreate = false
-    private lateinit var builder: OkHttpClient.Builder
+    lateinit var builder: OkHttpClient.Builder
     var okHttpClient: OkHttpClient? = null
         get() {
             if (field == null || reCreate) {

@@ -23,6 +23,8 @@ class MyApplication: Application() {
         OkhttpClientProvider.configOkHttpClient {
             val dispatcher = Dispatcher()
             dispatcher.maxRequests = 1
+            dispatcher(dispatcher)
+            configCache(this@MyApplication)//配置缓存策略
             var loggerInterceptor: LoggingInterceptor? = null
             val isDebug = true
             if (isDebug) {
@@ -44,7 +46,6 @@ class MyApplication: Application() {
                     this.addInterceptor(it)
                 }
             }
-            this.dispatcher(dispatcher)
         }
     }
 
