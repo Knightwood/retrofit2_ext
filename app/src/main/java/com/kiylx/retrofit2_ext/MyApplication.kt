@@ -6,6 +6,7 @@ import com.kiylx.libx.http.kotlin.common.OkhttpClientProvider
 import com.kiylx.libx.http.okhttp_logger.Level
 import com.kiylx.libx.http.okhttp_logger.LoggingInterceptor
 import com.kiylx.retrofit2_ext.example2_doc.HeaderInterceptor
+import com.kiylx.retrofit2_ext.http.NetworkCacheInterceptor.Companion.configCache
 import okhttp3.Dispatcher
 import java.util.concurrent.TimeUnit
 

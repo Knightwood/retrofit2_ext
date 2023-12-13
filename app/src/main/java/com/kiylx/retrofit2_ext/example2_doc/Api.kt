@@ -56,9 +56,16 @@ Query与QueryMap 和Field与FieldMap注解 功能一样,不同的是Query与Quer
 
      */
 interface Api {
-    @GET
-    fun login(): Call<User>
+    //<editor-fold desc="get请求">
 
+    @GET("/get请求的路径")
+    fun login(
+        @Header("token") token: String,//添加header，也可以在拦截器中读取和修改
+    ): Call<User>
+
+    //</editor-fold>
+
+    //<editor-fold desc="post请求-表单">
     //FormUrlEncoded注解:
     //用于修饰Field注解和FieldMap注解
     //使用该注解,表示请求正文将使用表单网址编码。字段应该声明为参数，并用@Field注释或FieldMap注释。
@@ -81,28 +88,49 @@ interface Api {
     //map中每一项的键和值都不能为空,否则抛出IllegalArgumentException异常
     //示例:
     /**
-     * 这是个post表单请求
+     * 这个post表单请求使用map传参
      */
     @FormUrlEncoded
     @POST("/things")
     fun things(@FieldMap fields: Map<String, String>): Call<ResponseBody>
 
+    //</editor-fold>
 
+    //<editor-fold desc="post请求-json">
     //@Body注解：
     //非表单的post或put请求
     //当你发送一个post或put请求,但是又不想作为请求参数或表单的方式发送请求时,
     //使用该注解定义的参数可以直接传入一个实体类,retrofit会通过convert把该实体序列化并将序列化后的结果直接作为请求体发送出去.
     //示例:
     /**
-     * 这是个非表单的post请求
-     * json格式
+     * 这是个post json请求
+     * 传入 User类 会自动转换，效果等同于[placeUpload2]方法，
+     * 但是[placeUpload2]传参会更灵活，因为都早requestbody可以不受现有的entity的结构限制
+     *
      */
     @POST("users")
     //on below line we are creating a method to post our data.
-    fun createPost(@Body dataModal: User): Call<User>
+    fun placeUpload1(
+        @Body dataModal: User,
+        @Header("token") token: String = "",
+    ): Call<User>
+
+    /**
+     * 这也是个post json请求，
+     */
+    @POST("placeUpload")
+    fun placeUpload2(
+        @Body body: RequestBody,
+        @Header("token") token: String = "",
+    ): Call<User>
 
 
-//=============================文件和数据===============================
+    //</editor-fold>
+
+
+    //<editor-fold desc="post请求-带文件的表单">
+
+
     //Multipart注解:
     //作用于方法
     //使用该注解,表示请求体是多部分的。 每一部分作为一个参数,且用Part注解声明
@@ -114,6 +142,20 @@ interface Api {
     //1, 如果类型是okhttp3.MultipartBody.Part，内容将被直接使用。 省略part中的名称,即 @Part  part: MultipartBody.Part
     //2, 如果类型是RequestBody，那么该值将直接与其内容类型一起使用。 在注释中提供part名称（例如，@Part（“foo”）foo: RequestBody ）。
     //3, 其他对象类型将通过使用转换器转换为适当的格式。 在注释中提供part名称（例如，@Part（“foo”） photo: Image）。
+    //如果参数类型是MultipartBody.Part，part注解内不能用name，即@Part（“foo”）将会报错
+
+    /**
+     * post表单，包含文件和一些字符串
+     */
+    @Multipart
+    @POST("message/addVoice")
+    fun uploadVoiceMsg(
+        @Part("setUser") id: Int,
+        @Part("setUserName") setUserName: String,
+        @Part("messageContent") messageContent: String,
+        @Part file: MultipartBody.Part?,
+        @Header("token") token: String = ""
+    ): Call<User2>
 
     /**
      * Let me explain each part of the definition above.
@@ -142,22 +184,23 @@ interface Api {
     @POST("/upload")
     fun upload(
         @Part("file") file: RequestBody,
-        @PartMap params: Map<String, @JvmSuppressWildcards  RequestBody>,
+        @PartMap params: Map<String, @JvmSuppressWildcards RequestBody>,
     ): Call<ResponseBody>
 
-
     /**
-     * 上传json和文件的post表单请求
+     * part注解可以用在很多种类型上面，retrofit2会自动做转换。
+     * 注意方法要加上@Multipart
      */
     @Multipart
     @POST("/post的路径2")
     fun post2(
         @Part part: MultipartBody.Part,//单文件
         @Part files: List<MultipartBody.Part>, //多文件
-        //MultipartBody.Part包装了RequestBody。
-        //一个bean可以序列化后用RequestBody包装。
-        //文件也可以用这个包装，然后再用MultipartBody.Part包装
+        //MultipartBody.Part实际上持有了RequestBody。
+        //所以，不仅文件可以生成MultipartBody.Part，字符串，json也都可以。
+        //但其实这里是retrofit2做了处理，他会把MultipartBody.Part之外的东西进行包装
         @Part part2: RequestBody,
+        @Part bean: User,//是的，实体也行，只要转换器能转换即可
     ): Call<ResponseBody>
 
     /**
@@ -187,8 +230,26 @@ interface Api {
     @POST("aa/bb")
     @Multipart
     fun test(
-        @Part entity:MultipartBody.Part,
+        @Part entity: MultipartBody.Part,
         @Part file: MultipartBody.Part?
-    ):Call<ResponseBody>
+    ): Call<ResponseBody>
+
+
+    //但实际上，可以抛开@Multipart注解，使用@Body 直接传文件
+    @POST("update/img")
+    fun postImg(@Body requestBody: RequestBody): Call<ResponseBody>
+    //注意：此处不能添加@Multipart或@FormUrlEncoded注解，不然会报错。
+    //
+    //构造请求数据时采用如下方式：
+    //MultipartBody.Builder builder = new MultipartBody.Builder()
+    //        .setType(MultipartBody.FORM)
+    //        .addFormDataPart("param1","param1")
+    //    	.addFormDataPart("img", img.getName(), RequestBody.create(img, MediaType.parse("image/jpeg")));
+    //
+    //postImg(builder.build());
+    //如果是多文件，接口注解不变，在添加文件时在继续执行addFormDataPart即可。
+    //这种方式就是自己构造请求体，而不用retrofit2的处理
+
+    //</editor-fold>
 
 }

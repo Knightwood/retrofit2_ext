@@ -79,30 +79,3 @@ class RequestHandler {
         }
     }
 }
-/**
- * 常用的mediaType 字符串
- */
-class MediaTypeStr {
-    companion object {
-        const val stream = "application/octet-stream"
-        const val form_data: String = "multipart/form-data"
-        const val image: String = "image/*"
-        const val text: String = "text/*"
-        const val application_json :String ="application/json"
-    }
-}
-
-/**
- * 将文件打包成MultipartBody.Part
- * @param mediaType 文件的媒体类型
- * @param name 参数名称
- */
-fun File.packageToPart(
-    mediaType: String,
-    name: String,
-    fileName: String = this.name,
-): MultipartBody.Part {
-    return MultipartBody.Part.createFormData(name,
-        filename = fileName,
-        this.asRequestBody(mediaType.toMediaTypeOrNull()))
-}

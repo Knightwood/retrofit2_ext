@@ -2,6 +2,7 @@ package com.kiylx.retrofit2_ext.example_2
 
 import com.kiylx.libx.http.kotlin.basic2.Resource2
 import com.kiylx.libx.http.kotlin.basic2.handleApi2
+import com.kiylx.libx.http.kotlin.basic3.handleApi3
 import com.kiylx.libx.http.kotlin.common.BaseErrorHandler
 import com.kiylx.libx.http.kotlin.common.RawResponse
 import com.kiylx.libx.http.kotlin.common.Retrofit2Holder
@@ -38,8 +39,17 @@ object WanAndroidRepo {
         }
     }
 
-    suspend fun getData(): Resource2<FriendData> {
+    /**
+     * resources2 版本
+     */
+    suspend fun resource2GetData(): Resource2<FriendData> {
         return handleApi2(mainApi.getData(), errorHandler = globalErrHandler)
     }
 
+    /**
+     * rawResponse 版本
+     */
+    suspend fun rawResponseGetData(): RawResponse<FriendData> {
+        return handleApi3(mainApi.getData(), errorHandler = globalErrHandler)
+    }
 }
