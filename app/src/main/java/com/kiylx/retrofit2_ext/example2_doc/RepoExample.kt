@@ -1,5 +1,6 @@
 package com.kiylx.retrofit2_ext.example2_doc
 
+import androidx.core.content.FileProvider
 import com.kiylx.libx.http.kotlin.basic.Resource
 import com.kiylx.libx.http.kotlin.basic.handleApi
 import com.kiylx.libx.http.kotlin.basic2.Resource2

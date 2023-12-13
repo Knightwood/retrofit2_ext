@@ -4,16 +4,15 @@ import android.content.ContentResolver
 import android.content.res.AssetFileDescriptor
 import android.net.Uri
 import android.os.ParcelFileDescriptor
-import android.provider.DocumentsProvider
+import com.kiylx.libx.http.kotlin.failureThen
+import com.kiylx.libx.http.kotlin.runCatchingChain
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okio.BufferedSink
 import okio.source
 import java.io.FileNotFoundException
-import java.io.IOException
-import androidx.documentfile.provider.DocumentFile
-import com.kiylx.libx.R
+import java.io.InputStream
 
 fun Uri.getContentType(contentResolver: ContentResolver): MediaType? =
     contentResolver.getType(this)?.toMediaTypeOrNull()
@@ -21,28 +20,22 @@ fun Uri.getContentType(contentResolver: ContentResolver): MediaType? =
 /**
  *  It supports file/content/mediaStore/asset URIs. asset not tested
  */
-fun Uri.createAssetFileDescriptor(contentResolver: ContentResolver) = try {
-    contentResolver.openAssetFileDescriptor(this, "r")
-} catch (e: FileNotFoundException) {
-    null
+fun Uri.createAssetFileDescriptor(contentResolver: ContentResolver): AssetFileDescriptor? {
+    return contentResolver.openAssetFileDescriptor(this, "r")
 }
 
 /** It supports file/content/mediaStore URIs.
  * Will not work with providers that return sub-sections of files
  */
-fun Uri.createParcelFileDescriptor(contentResolver: ContentResolver) = try {
-    contentResolver.openFileDescriptor(this, "r")
-} catch (e: FileNotFoundException) {
-    null
+fun Uri.createParcelFileDescriptor(contentResolver: ContentResolver): ParcelFileDescriptor? {
+    return contentResolver.openFileDescriptor(this, "r")
 }
 
 /** - It supports file/content/mediaStore/asset URIs. asset not tested
  * - When file URI is used, may get contentLength error (expected x but got y)
  *  error when uploading if contentLength header is filled from assetFileDescriptor.length */
-fun Uri.createInputStreamFromContentResolver(contentResolver: ContentResolver) = try {
-    contentResolver.openInputStream(this)
-} catch (e: FileNotFoundException) {
-    null
+fun Uri.createInputStreamFromContentResolver(contentResolver: ContentResolver): InputStream? {
+    return contentResolver.openInputStream(this)
 }
 
 /**
@@ -102,44 +95,36 @@ fun Uri.asRequestBody(
 
         /** This may get called twice if HttpLoggingInterceptor is used */
         override fun writeTo(sink: BufferedSink) {
-            val inputStream = createInputStreamFromContentResolver(contentResolver)
-            if (inputStream != null) {
-                inputStream
+            runCatchingChain {
+                val parcelFileDescriptor = createParcelFileDescriptor(contentResolver)!!
+                // when InputStream is closed, it auto closes ParcelFileDescriptor
+                ParcelFileDescriptor.AutoCloseInputStream(parcelFileDescriptor)
                     .source()
                     .use { source ->
                         sink.writeAll(source)
                     }
-            } else {
-                val parcelFileDescriptor = createParcelFileDescriptor(contentResolver)
-                if (parcelFileDescriptor != null) {
-                    // when InputStream is closed, it auto closes ParcelFileDescriptor
-                    ParcelFileDescriptor.AutoCloseInputStream(parcelFileDescriptor)
-                        .source()
-                        .use { source ->
-                            sink.writeAll(source)
-                        }
-                } else {
-                    throw IOException()
-                }
-            }
+            }.failureThen {
+                val inputStream = createInputStreamFromContentResolver(contentResolver)!!
+                inputStream.source()
+                    .use { source ->
+                        sink.writeAll(source)
+                    }
+            }.getOrThrow()
+
         }
 
         /**
          * count file length
          */
         private fun countBytes(): Long {
-
-            val inputStream = createInputStreamFromContentResolver(contentResolver)
-            if (inputStream != null) {
-                return inputStream.available().toLong()
-            } else {
-                val parcelFileDescriptor = createParcelFileDescriptor(contentResolver)
-                if (parcelFileDescriptor != null) {
-                    return parcelFileDescriptor.statSize
-                } else {
-                    throw IOException()
-                }
-            }
+            val bytesCount: Long = runCatchingChain<Long> {
+                val parcelFileDescriptor = createParcelFileDescriptor(contentResolver)!!
+                parcelFileDescriptor.statSize.toLong()
+            }.failureThen<Long> {
+                val inputStream = createInputStreamFromContentResolver(contentResolver)!!
+                inputStream.available().toLong()
+            }.getOrThrow()
+            return bytesCount
         }
 
     }
@@ -154,7 +139,7 @@ fun Uri.assetFileAsRequestBody(
     contentResolver: ContentResolver,
     unknownLength: Boolean = false,
 ): RequestBody {
-
+    val TAG = "assetFileAsRequestBody"
     return object : RequestBody() {
         /** If null is given, it is binary for Streams */
         override fun contentType() = getContentType(contentResolver)
@@ -165,17 +150,13 @@ fun Uri.assetFileAsRequestBody(
 
         /** This may get called twice if HttpLoggingInterceptor is used */
         override fun writeTo(sink: BufferedSink) {
-            val assetFileDescriptor = createAssetFileDescriptor(contentResolver)
-            if (assetFileDescriptor != null) {
-                // when InputStream is closed, it auto closes AssetFileDescriptor
-                AssetFileDescriptor.AutoCloseInputStream(assetFileDescriptor)
-                    .source()
-                    .use { source ->
-                        sink.writeAll(source)
-                    }
-            } else {
-                throw FileNotFoundException("file not found")
-            }
+            val assetFileDescriptor = createAssetFileDescriptor(contentResolver)!!
+            // when InputStream is closed, it auto closes AssetFileDescriptor
+            AssetFileDescriptor.AutoCloseInputStream(assetFileDescriptor)
+                .source()
+                .use { source ->
+                    sink.writeAll(source)
+                }
         }
 
         /**
@@ -190,21 +171,5 @@ fun Uri.assetFileAsRequestBody(
             }
         }
 
-    }
-}
-
-inline fun <T> chain(func: () -> T): Result<T> {
-    return runCatching(func)
-}
-
-inline fun <T, R> Result<T>.then(block: Result<T>.() -> R): Result<R> {
-    if (this.isFailure) {
-        return try {
-            Result.success(block())
-        } catch (e: Throwable) {
-            Result.failure(e)
-        }
-    } else {
-        throw IllegalStateException("chain end")
     }
 }

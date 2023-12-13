@@ -88,6 +88,23 @@ object OkhttpPartHelper {
         return entityPart
     }
 
+    /**
+     * asset文件uri生成[MultipartBody.Part],作用同[uriPackToPart]
+     */
+    fun assetUriPackToPart(
+        uri: Uri,
+        fieldName: String,
+        contentResolver: ContentResolver,
+        unknownLength: Boolean = false,
+    ): MultipartBody.Part {
+        val entityPart = MultipartBody.Part.createFormData(
+            fieldName,
+            uriToFileName(uri, contentResolver),
+            uri.assetFileAsRequestBody(contentResolver, unknownLength)
+        )
+        return entityPart
+    }
+
     @SuppressLint("Range")
     fun uriToFileName(
         uri: Uri,
@@ -97,10 +114,11 @@ object OkhttpPartHelper {
             ContentResolver.SCHEME_FILE -> uri.toFile().name
             ContentResolver.SCHEME_CONTENT -> {
                 val cursor = contentResolver.query(uri, null, null, null, null, null)
-                cursor?.let {_cursor->
+                cursor?.let { _cursor ->
                     kotlin.runCatching {
                         _cursor.moveToFirst()
-                        val displayName = _cursor.getString(_cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                        val displayName =
+                            _cursor.getString(_cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
                         _cursor.close()
                         displayName
                     }.getOrNull()
